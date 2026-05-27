@@ -1,8 +1,15 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿@model List<L2.Models.AnimeCharacter>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1>Аниме-персонажи</h1>
+
+<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+    @foreach (var c in Model)
+    {
+        <div style="border: 1px solid #ccc; padding: 0.8rem; width: 200px;">
+            <img src="@c.ImageUrl" alt="@c.Name" style="width: 100%; height: auto;">
+            <h3>@c.Name</h3>
+            <p>@c.Anime, возраст @c.Age</p>
+            <a href="/Home/Details/@c.Id">Подробнее</a>
+        </div>
+    }
 </div>

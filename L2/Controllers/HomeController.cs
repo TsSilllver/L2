@@ -1,25 +1,26 @@
-using L2.Models;
+using L2.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
-namespace L2.Controllers
+namespace L2.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly IAnimeRepository _animeRepository;
+
+    public HomeController(IAnimeRepository animeRepository)
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        _animeRepository = animeRepository;
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    public IActionResult Index()
+    {
+        var characters = _animeRepository.GetAll();
+        return View(characters);
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    public IActionResult Details(int id)
+    {
+        var character = _animeRepository.GetById(id);
+        return View(character);
     }
 }
