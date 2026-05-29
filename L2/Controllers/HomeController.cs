@@ -23,4 +23,9 @@ public class HomeController : Controller
         var character = _animeRepository.GetById(id);
         return View(character);
     }
+
+    public IActionResult Contact()
+    {
+        return View();
+    }
 }

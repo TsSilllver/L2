@@ -1,15 +1,18 @@
 ﻿@model List<L2.Models.AnimeCharacter>
 
-<h1>Аниме-персонажи</h1>
-
-<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+<div class="d-flex justify-content-between">
     @foreach (var c in Model)
     {
-        <div style="border: 1px solid #ccc; padding: 0.8rem; width: 200px;">
-            <img src="@c.ImageUrl" alt="@c.Name" style="width: 100%; height: auto;">
-            <h3>@c.Name</h3>
-            <p>@c.Anime, возраст @c.Age</p>
-            <a href="/Home/Details/@c.Id">Подробнее</a>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="card h-100">
+                <img class="card-img-top" src="@c.ImageUrl" alt="@c.Name">
+                <div class="card-body">
+                    <h5 class="card-title">@c.Name</h5>
+                    <p class="card-text">Аниме: @c.Anime, возраст @c.Age</p>
+                    <p class="card-text">@c.Description</p>
+                    <a asp-controller="Home" asp-action="Details" asp-route-id="@c.Id">Детали</a>
+                </div>
+            </div>
         </div>
     }
 </div>
