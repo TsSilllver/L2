@@ -12,15 +12,16 @@ public class HomeController : Controller
         _animeRepository = animeRepository;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var characters = _animeRepository.GetAll();
+        var characters = await _animeRepository.GetAllAsync();
         return View(characters);
     }
 
-    public IActionResult Details(int id)
+    public async Task<IActionResult> Details(int id)
     {
-        var character = _animeRepository.GetById(id);
+        var character = await _animeRepository.GetDetailsByIdAsync(id);
+        if (character == null) return NotFound();
         return View(character);
     }
 

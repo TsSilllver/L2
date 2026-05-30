@@ -1,11 +1,18 @@
+using L2.Data;
 using L2.Repositories;
 using L2.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddTransient<IAnimeRepository, AnimeDbRepository>();
+string connection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=AnimeDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;";
+
+builder.Services.AddDbContext<AnimeDbContext>(options =>
+    options.UseSqlServer(connection));
+
+builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
 
 var app = builder.Build();
 

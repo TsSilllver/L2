@@ -4,6 +4,6 @@ namespace L2.Repositories.Interfaces;
 
 public interface IAnimeRepository
 {
-    List<AnimeCharacter> GetAll();
-    AnimeCharacter? GetById(int id);
+    Task<List<AnimeCharacter>> GetAllAsync();
+    Task<AnimeCharacter?> GetDetailsByIdAsync(int id);
 }

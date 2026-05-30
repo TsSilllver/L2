@@ -1,18 +1,22 @@
 ﻿@model List<L2.Models.AnimeCharacter>
 
-<div class="d-flex justify-content-between">
-    @foreach (var c in Model)
-    {
-        <div class="col-md-3 col-sm-6 mb-4">
-            <div class="card h-100">
-                <img class="card-img-top" src="@c.ImageUrl" alt="@c.Name">
-                <div class="card-body">
-                    <h5 class="card-title">@c.Name</h5>
-                    <p class="card-text">Аниме: @c.Anime, возраст @c.Age</p>
-                    <p class="card-text">@c.Description</p>
-                    <a asp-controller="Home" asp-action="Details" asp-route-id="@c.Id">Детали</a>
+<div class="container mt-4">
+    <div class="row g-4">
+        @foreach (var c in Model)
+        {
+            <div class="col-md-6 col-lg-4 col-xl-3">
+                <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
+                    <img class="card-img-top" src="@c.ImageUrl" alt="@c.Name" style="height: 200px; object-fit: cover;">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold">@c.Name</h5>
+                        <p class="card-text text-muted">Возраст: @c.Age лет</p>
+                        <p class="card-text flex-grow-1">@c.Description</p>
+                        <a asp-controller="Home" asp-action="Details" asp-route-id="@c.Id" class="btn btn-outline-primary mt-2 rounded-pill">
+                            Подробнее →
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
