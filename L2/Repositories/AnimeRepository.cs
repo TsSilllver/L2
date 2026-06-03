@@ -25,4 +25,10 @@ public class AnimeRepository : IAnimeRepository
             .Include(x => x.Studio)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
+
+    public async Task AddStudioAsync(Studio studio)
+    {
+        await _context.Studios.AddAsync(studio);
+        await _context.SaveChangesAsync();
+    }
 }

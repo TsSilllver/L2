@@ -1,0 +1,22 @@
+﻿@model L2.Models.Studio
+
+<h1>Добавить студию</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label>Название студии: </label>
+        <input asp-for="@Model.Name" type="text" class="form-control" placeholder="Название студии">
+    </div>
+
+    <div class="form-group">
+        <label>Страна: </label>
+        <input asp-for="@Model.Country" type="text" class="form-control" placeholder="Страна">
+    </div>
+
+    <div class="form-group">
+        <label>Год основания: </label>
+        <input asp-for="@Model.FoundedYear" type="number" class="form-control" placeholder="Год основания">
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Создать" />
+</form>
