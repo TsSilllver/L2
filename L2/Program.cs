@@ -13,6 +13,7 @@ builder.Services.AddDbContext<AnimeDbContext>(options =>
     options.UseSqlServer(connection));
 
 builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
+builder.Services.AddScoped<IStudioRepository, StudioRepository>();
 
 var app = builder.Build();
 

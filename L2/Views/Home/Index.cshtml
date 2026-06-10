@@ -2,18 +2,18 @@
 
 <div class="container mt-4">
     <div class="row g-4">
-        @foreach (var c in Model)
+        @foreach (var character in Model)
         {
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
-                    <img class="card-img-top" src="@c.ImageUrl" alt="@c.Name" style="height: 200px; object-fit: cover;">
+                    <img class="card-img-top" src="@character.ImageUrl" alt="@character.Name" style="height: 200px; object-fit: cover;">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold">@c.Name</h5>
-                        <p class="card-text text-muted">Возраст: @c.Age лет</p>
-                        <p class="card-text flex-grow-1">@c.Description</p>
-                        <a asp-controller="Home" asp-action="Details" asp-route-id="@c.Id" class="btn btn-outline-primary mt-2 rounded-pill">
-                            Подробнее →
-                        </a>
+                        <h5 class="card-title fw-bold">@character.Name</h5>
+                        <p class="card-text text-muted">Возраст: @character.Age лет</p>
+                        <p class="card-text flex-grow-1">@character.Description</p>
+                        <a asp-controller="Home" asp-action="Details" asp-route-id="@character.Id" class="btn btn-outline-primary mt-2 rounded-pill">Подробнее</a>
+                        <a asp-controller="Home" asp-action="Edit" asp-route-id="@character.Id" class="btn btn-outline-warning mt-2 rounded-pill">Редактировать</a>
+                        <a asp-controller="Home" asp-action="Delete" asp-route-id="@character.Id" class="btn btn-outline-danger mt-2 rounded-pill" onclick="return confirm('Удалить персонажа?')">Удалить</a>
                     </div>
                 </div>
             </div>

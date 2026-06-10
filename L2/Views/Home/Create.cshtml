@@ -1,22 +1,79 @@
-﻿@model L2.Models.Studio
+﻿@model L2.ViewModels.CreateCharacterViewModel
 
-<h1>Добавить студию</h1>
+<h1>Создать персонажа</h1>
 
 <form method="post">
     <div class="form-group">
-        <label>Название студии: </label>
-        <input asp-for="@Model.Name" type="text" class="form-control" placeholder="Название студии">
+        <label>Имя персонажа:</label>
+        <input asp-for="@Model.Character.Name" type="text" class="form-control" placeholder="Имя персонажа">
+
+        @if (Model.ErrorsByProperty.ContainsKey("Name"))
+        {
+            @foreach (var error in Model.ErrorsByProperty["Name"])
+            {
+                <small class="form-text text-danger">@error</small>
+            }
+        }
     </div>
 
     <div class="form-group">
-        <label>Страна: </label>
-        <input asp-for="@Model.Country" type="text" class="form-control" placeholder="Страна">
+        <label>Описание:</label>
+        <textarea asp-for="@Model.Character.Description" class="form-control" placeholder="Описание" rows="3"></textarea>
+
+        @if (Model.ErrorsByProperty.ContainsKey("Description"))
+        {
+            @foreach (var error in Model.ErrorsByProperty["Description"])
+            {
+                <small class="form-text text-danger">@error</small>
+            }
+        }
     </div>
 
     <div class="form-group">
-        <label>Год основания: </label>
-        <input asp-for="@Model.FoundedYear" type="number" class="form-control" placeholder="Год основания">
+        <label>Возраст:</label>
+        <input asp-for="@Model.Character.Age" type="number" class="form-control" placeholder="Возраст">
+
+        @if (Model.ErrorsByProperty.ContainsKey("Age"))
+        {
+            @foreach (var error in Model.ErrorsByProperty["Age"])
+            {
+                <small class="form-text text-danger">@error</small>
+            }
+        }
+    </div>
+
+    <div class="form-group">
+        <label>URL картинки:</label>
+        <input asp-for="@Model.Character.ImageUrl" type="text" class="form-control" placeholder="https://example.com/image.jpg">
+
+        @if (Model.ErrorsByProperty.ContainsKey("ImageUrl"))
+        {
+            @foreach (var error in Model.ErrorsByProperty["ImageUrl"])
+            {
+                <small class="form-text text-danger">@error</small>
+            }
+        }
+    </div>
+
+    <div class="form-group">
+        <label>Студия:</label>
+        <select asp-for="@Model.Character.StudioId" class="form-control">
+            <option value="">-- Выберите студию --</option>
+            @for (int i = 0; i < Model.Studios.Count; i++)
+            {
+                <option value="@Model.Studios[i].Id">@Model.Studios[i].Name</option>
+            }
+        </select>
+
+        @if (Model.ErrorsByProperty.ContainsKey("StudioId"))
+        {
+            @foreach (var error in Model.ErrorsByProperty["StudioId"])
+            {
+                <small class="form-text text-danger">@error</small>
+            }
+        }
     </div>
 
     <input type="submit" class="btn btn-primary" value="Создать" />
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Назад</a>
 </form>
