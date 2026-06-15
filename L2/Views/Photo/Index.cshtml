@@ -1,0 +1,25 @@
+﻿@using L2.Helper
+@model List<L2.Models.Photo>
+
+@{
+    ViewData["Title"] = "Фотогалерея";
+}
+
+<h1>Фотогалерея</h1>
+
+<div class="row">
+    @foreach (var photo in Model)
+    {
+        <div class="card m-3" style="width: 18rem;">
+            <img class="card-img-top" src="@ImgConverter.ConvertImg(photo.PhotoData)" alt="@photo.Name">
+            <div class="card-body">
+                <h5 class="card-title">@photo.Name</h5>
+            </div>
+        </div>
+    }
+</div>
+
+<div>
+    <a asp-action="Upload" class="btn btn-primary">Загрузить новое фото</a>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">На главную</a>
+</div>

@@ -7,10 +7,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 
-string connection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=AnimeDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;";
 
+string animeConnection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=AnimeDatabase;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;";
 builder.Services.AddDbContext<AnimeDbContext>(options =>
-    options.UseSqlServer(connection));
+    options.UseSqlServer(animeConnection));
+
+
+string photoConnection = builder.Configuration.GetConnectionString("PhotoConnection")
+    ?? "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=PhotoDb;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=False;";
+builder.Services.AddDbContext<AppPhotoContext>(options =>
+    options.UseSqlServer(photoConnection));
 
 builder.Services.AddScoped<IAnimeRepository, AnimeRepository>();
 builder.Services.AddScoped<IStudioRepository, StudioRepository>();
