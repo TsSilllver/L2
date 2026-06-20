@@ -45,6 +45,13 @@ public class AnimeRepository : IAnimeRepository
         return await _context.AnimeCharacters.ToListAsync();
     }
 
+    public async Task<List<AnimeCharacter>> GetFilteredAsync(string nameCharacter)
+    {
+        return await _context.AnimeCharacters
+            .Where(c => c.Name.Contains(nameCharacter))
+            .ToListAsync();
+    }
+
     public async Task<AnimeCharacter> GetByIdAsync(int id)
     {
         return await _context.AnimeCharacters.FirstAsync(x => x.Id == id);
@@ -52,6 +59,8 @@ public class AnimeRepository : IAnimeRepository
 
     public async Task<AnimeCharacter> GetDetailsByIdAsync(int id)
     {
-        return await _context.AnimeCharacters.Include(x => x.Studio).FirstAsync(x => x.Id == id);
+        return await _context.AnimeCharacters
+            .Include(x => x.Studio)
+            .FirstAsync(x => x.Id == id);
     }
 }

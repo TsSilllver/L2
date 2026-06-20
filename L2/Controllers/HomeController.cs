@@ -16,10 +16,29 @@ public class HomeController : Controller
         _studioRepository = studioRepository;
     }
 
-    public async Task<IActionResult> Index()
+    [HttpGet]
+    public async Task<IActionResult> Index(string nameCharacter)
     {
-        var characters = await _animeRepository.GetAllAsync();
-        return View(characters);
+        FilteredCharactersViewModel filteredCharactersViewModel;
+
+        if (!string.IsNullOrEmpty(nameCharacter))
+        {
+            filteredCharactersViewModel = new FilteredCharactersViewModel
+            {
+                NameCharacter = nameCharacter,
+                FilteredCharacters = await _animeRepository.GetFilteredAsync(nameCharacter)
+            };
+        }
+        else
+        {
+            filteredCharactersViewModel = new FilteredCharactersViewModel
+            {
+                NameCharacter = nameCharacter,
+                FilteredCharacters = await _animeRepository.GetAllAsync()
+            };
+        }
+
+        return View(filteredCharactersViewModel);
     }
 
     public async Task<IActionResult> Details(int id)
@@ -31,8 +50,16 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Delete(int id)
     {
-        await _animeRepository.DeleteByIdAsync(id);
-        return RedirectToAction("Index");
+        var character = await _animeRepository.GetDetailsByIdAsync(id);
+        if (character == null) return NotFound();
+        return View(character);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Delete(AnimeCharacter character)
+    {
+        await _animeRepository.DeleteByIdAsync(character.Id);
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Edit(int id)
@@ -40,135 +67,85 @@ public class HomeController : Controller
         var character = await _animeRepository.GetDetailsByIdAsync(id);
         var studios = await _studioRepository.GetAllAsync();
 
-        var viewModel = new EditCharacterViewModel
+        var editCharacterViewModel = new EditCharacterViewModel()
         {
-            Character = character ?? new AnimeCharacter(),
+            Character = character,
             Studios = studios
         };
 
-        return View(viewModel);
+        return View(editCharacterViewModel);
     }
 
     [HttpPost]
     public async Task<IActionResult> Edit(EditCharacterViewModel editCharacterViewModel)
     {
-        var isModelValid = ModelState.IsValid;
-        var characterName = editCharacterViewModel.Character?.Name;
-
-        if (!isModelValid)
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            // Ошибки увидишь в отладчике
-        }
-        if (ModelState.IsValid)
-        {
-            await _animeRepository.EditAsync(editCharacterViewModel.Character);
-            return RedirectToAction("Index");
-        }
-
         editCharacterViewModel.Studios = await _studioRepository.GetAllAsync();
-        return View(editCharacterViewModel);
+        await _animeRepository.EditAsync(editCharacterViewModel.Character);
+
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Create()
     {
-        var studios = await _studioRepository.GetAllAsync();
-
-        var viewModel = new CreateCharacterViewModel
+        var character = new AnimeCharacter
         {
-            Character = new AnimeCharacter(),
-            Studios = studios,
-            ErrorsByProperty = new Dictionary<string, List<string>>()
+            Name = string.Empty,
+            Description = string.Empty,
+            Age = 0,
+            ImageUrl = string.Empty,
+            StudioId = 1
         };
 
-        return View(viewModel);
+        var studios = await _studioRepository.GetAllAsync();
+
+        var createCharacterViewModel = new CreateCharacterViewModel()
+        {
+            Character = character,
+            Studios = studios,
+            ErrorsByProperty = []
+        };
+
+        return View(createCharacterViewModel);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateCharacterViewModel viewModel)
+    public async Task<IActionResult> Create(CreateCharacterViewModel createCharacterViewModel)
     {
-        viewModel.Studios = await _studioRepository.GetAllAsync();
+        createCharacterViewModel.Studios = await _studioRepository.GetAllAsync();
 
         var errorsByProperty = new Dictionary<string, List<string>>
         {
             ["Name"] = [],
-            ["Description"] = [],
-            ["Age"] = [],
-            ["ImageUrl"] = [],
-            ["StudioId"] = []
+            ["Description"] = []
         };
 
-        if (string.IsNullOrWhiteSpace(viewModel.Character.Name))
+        if (createCharacterViewModel.Character.Name == null)
         {
             errorsByProperty["Name"].Add("Вы ввели пустое имя");
         }
-        else if (viewModel.Character.Name.Length < 2)
-        {
-            errorsByProperty["Name"].Add("Имя должно содержать минимум 2 символа");
-        }
-        else if (viewModel.Character.Name.Length > 50)
-        {
-            errorsByProperty["Name"].Add("Имя должно содержать максимум 50 символов");
-        }
 
-
-        if (string.IsNullOrWhiteSpace(viewModel.Character.Description))
+        if (createCharacterViewModel.Character.Description == null)
         {
             errorsByProperty["Description"].Add("Вы ввели пустое описание");
         }
-        else if (viewModel.Character.Description.Length < 10)
+
+        if (createCharacterViewModel.Character.Description?.Length > 500)
         {
-            errorsByProperty["Description"].Add("Описание должно содержать минимум 10 символов");
-        }
-        else if (viewModel.Character.Description.Length > 500)
-        {
-            errorsByProperty["Description"].Add("Описание должно содержать максимум 500 символов");
+            errorsByProperty["Description"].Add("Вы ввели слишком большое описание, максимальный размер 500 символов");
         }
 
-
-        if (viewModel.Character.Age < 1)
+        if (errorsByProperty["Name"].Count > 0 || errorsByProperty["Description"].Count > 0)
         {
-            errorsByProperty["Age"].Add("Возраст должен быть минимум 1 год");
-        }
-        else if (viewModel.Character.Age > 1000)
-        {
-            errorsByProperty["Age"].Add("Возраст должен быть максимум 1000 лет");
+            createCharacterViewModel.ErrorsByProperty = errorsByProperty;
+            return View(createCharacterViewModel);
         }
 
+        createCharacterViewModel.Character.Name = createCharacterViewModel.Character.Name.Trim();
+        createCharacterViewModel.Character.Description = createCharacterViewModel.Character.Description.Trim();
 
-        if (string.IsNullOrWhiteSpace(viewModel.Character.ImageUrl))
-        {
-            errorsByProperty["ImageUrl"].Add("Введите URL картинки");
-        }
-        else if (!viewModel.Character.ImageUrl.StartsWith("http"))
-        {
-            errorsByProperty["ImageUrl"].Add("Введите корректный URL (начинается с http:// или https://)");
-        }
+        await _animeRepository.AddAsync(createCharacterViewModel.Character);
 
-
-        if (viewModel.Character.StudioId <= 0)
-        {
-            errorsByProperty["StudioId"].Add("Выберите студию");
-        }
-
-
-        if (errorsByProperty["Name"].Count > 0 ||
-            errorsByProperty["Description"].Count > 0 ||
-            errorsByProperty["Age"].Count > 0 ||
-            errorsByProperty["ImageUrl"].Count > 0 ||
-            errorsByProperty["StudioId"].Count > 0)
-        {
-            viewModel.ErrorsByProperty = errorsByProperty;
-            return View(viewModel);
-        }
-
-
-        viewModel.Character.Name = viewModel.Character.Name.Trim();
-        viewModel.Character.Description = viewModel.Character.Description.Trim();
-
-        await _animeRepository.AddAsync(viewModel.Character);
-
-        return RedirectToAction("Index");
+        return RedirectToAction(nameof(Index));
     }
 
     public IActionResult Contact()
