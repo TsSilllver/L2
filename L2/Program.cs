@@ -1,4 +1,5 @@
 using L2.Data;
+using L2.Models;
 using L2.Repositories;
 using L2.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;

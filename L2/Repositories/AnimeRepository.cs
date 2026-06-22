@@ -40,16 +40,32 @@ public class AnimeRepository : IAnimeRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<List<AnimeCharacter>> GetAllAsync()
-    {
-        return await _context.AnimeCharacters.ToListAsync();
-    }
-
-    public async Task<List<AnimeCharacter>> GetFilteredAsync(string nameCharacter)
+    public async Task<List<AnimeCharacter>> GetAllAsync(int countSkip, int countTake)
     {
         return await _context.AnimeCharacters
-            .Where(c => c.Name.Contains(nameCharacter))
+            .Skip(countSkip)
+            .Take(countTake)
             .ToListAsync();
+    }
+
+    public async Task<(int countCharacters, List<AnimeCharacter> filteredCharacters)> GetFilteredAsync(
+        string nameCharacter, int countSkip, int pageSize)
+    {
+        var queryFilteredCharacters = _context.AnimeCharacters
+            .Where(c => c.Name.Contains(nameCharacter));
+
+        var countCharacters = await queryFilteredCharacters.CountAsync();
+        var filteredCharacters = await queryFilteredCharacters
+            .Skip(countSkip)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (countCharacters, filteredCharacters);
+    }
+
+    public async Task<int> GetCountAsync()
+    {
+        return await _context.AnimeCharacters.CountAsync();
     }
 
     public async Task<AnimeCharacter> GetByIdAsync(int id)

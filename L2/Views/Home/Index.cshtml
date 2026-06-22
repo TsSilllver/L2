@@ -1,11 +1,13 @@
-﻿@model L2.ViewModels.FilteredCharactersViewModel
+﻿@using L2.Models
+@using L2.ViewModels
+@model IndexCharacterViewModel
 
 <div class="container mt-4">
     <form method="get" class="mb-4">
         <div class="row g-2">
             <div class="col-md-10">
-                <input type="text" value="@Model.NameCharacter" name="nameCharacter" 
-                       class="form-control" placeholder="Введите имя персонажа для поиска">
+                <input type="text" value="@Model.FilteredCharactersViewModel.NameCharacter" 
+                       name="nameCharacter" class="form-control" placeholder="Введите имя персонажа">
             </div>
             <div class="col-md-2">
                 <button type="submit" class="btn btn-primary w-100">Найти</button>
@@ -14,7 +16,7 @@
     </form>
 
     <div class="row g-4">
-        @foreach (var character in Model.FilteredCharacters)
+        @foreach (var character in Model.PaginatedViewModelList.Items)
         {
             <div class="col-md-6 col-lg-4 col-xl-3">
                 <div class="card h-100 shadow-sm border-0 rounded-3 overflow-hidden">
@@ -31,4 +33,35 @@
             </div>
         }
     </div>
+
+    <nav class="mt-4">
+        <ul class="pagination">
+            <li class="page-item @(Model.PaginatedViewModelList.HasPreviousPage ? string.Empty : "disabled")">
+                <a class="page-link" 
+                   asp-route-nameCharacter="@Model.FilteredCharactersViewModel.NameCharacter" 
+                   asp-route-pageIndex="@(Model.PaginatedViewModelList.PageIndex - 1)">
+                    Предыдущая
+                </a>
+            </li>
+
+            @for (int pageCount = 1; pageCount <= Model.PaginatedViewModelList.TotalPages; pageCount++)
+            {
+                <li class="page-item @(pageCount == Model.PaginatedViewModelList.PageIndex ? "active" : string.Empty)">
+                    <a class="page-link" 
+                       asp-route-nameCharacter="@Model.FilteredCharactersViewModel.NameCharacter" 
+                       asp-route-pageIndex="@pageCount">
+                        @pageCount
+                    </a>
+                </li>
+            }
+
+            <li class="page-item @(Model.PaginatedViewModelList.HasNextPage ? string.Empty : "disabled")">
+                <a class="page-link" 
+                   asp-route-nameCharacter="@Model.FilteredCharactersViewModel.NameCharacter" 
+                   asp-route-pageIndex="@(Model.PaginatedViewModelList.PageIndex + 1)">
+                    Следующая
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>

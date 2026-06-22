@@ -10,6 +10,8 @@ public class HomeController : Controller
     private readonly IAnimeRepository _animeRepository;
     private readonly IStudioRepository _studioRepository;
 
+    private const int PageSize = 10;
+
     public HomeController(IAnimeRepository animeRepository, IStudioRepository studioRepository)
     {
         _animeRepository = animeRepository;
@@ -17,28 +19,48 @@ public class HomeController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string nameCharacter)
+    public async Task<IActionResult> Index(string? nameCharacter = null, int pageIndex = 1)
     {
+        List<AnimeCharacter> filteredCharacters;
         FilteredCharactersViewModel filteredCharactersViewModel;
+
+        int countCharacters;
+        var countSkip = (pageIndex - 1) * PageSize;
 
         if (!string.IsNullOrEmpty(nameCharacter))
         {
+            var filteredCharactersDto = await _animeRepository.GetFilteredAsync(
+                nameCharacter, countSkip, PageSize);
+
+            filteredCharacters = filteredCharactersDto.filteredCharacters;
+            countCharacters = filteredCharactersDto.countCharacters;
+
             filteredCharactersViewModel = new FilteredCharactersViewModel
             {
-                NameCharacter = nameCharacter,
-                FilteredCharacters = await _animeRepository.GetFilteredAsync(nameCharacter)
+                NameCharacter = nameCharacter
             };
         }
         else
         {
+            countCharacters = await _animeRepository.GetCountAsync();
+            filteredCharacters = await _animeRepository.GetAllAsync(countSkip, PageSize);
+
             filteredCharactersViewModel = new FilteredCharactersViewModel
             {
-                NameCharacter = nameCharacter,
-                FilteredCharacters = await _animeRepository.GetAllAsync()
+                NameCharacter = nameCharacter
             };
         }
 
-        return View(filteredCharactersViewModel);
+        var paginatedViewModelList = new PaginatedViewModelList<AnimeCharacter>(
+            filteredCharacters, countCharacters, pageIndex, PageSize);
+
+        var indexCharacterViewModel = new IndexCharacterViewModel
+        {
+            FilteredCharactersViewModel = filteredCharactersViewModel,
+            PaginatedViewModelList = paginatedViewModelList
+        };
+
+        return View(indexCharacterViewModel);
     }
 
     public async Task<IActionResult> Details(int id)
